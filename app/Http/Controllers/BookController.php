@@ -17,13 +17,22 @@ class BookController extends Controller
     }
 
     public function store(Request $request) {
-        $book = Book::create([
-            'title' => $request['title'],
-            'author' => $request['author'],
-            'released_at' => $request['released_at'],
+        $validated = $request->validate([
+            "title" => "required|string|max:140",
+            "author" => "required|string|max:100",
+            "released_at" => "required"
+        ],
+        [
+            'title.required' => "title shall not be forgotten",
+            'title.max' => 'max title lenght 140 characters',
+            'author.required' => 'author must always be mentioned',
+            'author.max' => 'max author lenght 100 characters',
+            'released_at.required' => 'date is manditory',
         ]);
 
-        return redirect('/books/' . $book->id);
+        $book = Book::create($validated);
+
+        return redirect()->route('show', $book)->with("success", "book created successfully");
     }
 
     public function show($id) {
@@ -38,12 +47,20 @@ class BookController extends Controller
 
     public function update(Request $request, $id) {
         $book = Book::find($id);
-        $book->update([
-            'title' => $request['title'],
-            'author' => $request['author'],
-            'released_at' => $request['released_at'],
+         $validated = $request->validate([
+            "title" => "required|string|max:140",
+            "author" => "required|string|max:100",
+            "released_at" => "required"
+        ],
+        [
+            'title.required' => "title shall not be forgotten",
+            'title.max' => 'max title lenght 140 characters',
+            'author.required' => 'author must always be mentioned',
+            'author.max' => 'max author lenght 100 characters',
+            'released_at.required' => 'date is manditory',
         ]);
+        $book->update($validated);
 
-        return redirect('/books/' . $book->id);
+        return redirect()->route('show', $book)->with("success", "book edited successfully");
     }
 }
